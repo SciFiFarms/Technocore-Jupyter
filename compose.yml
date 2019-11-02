@@ -11,7 +11,7 @@ volumes:
   EXAMPLE_SERVICE:
   EXAMPLE_SERVICE-db:
 
-#secrets:
+secrets:
   # Secrets format
   # ${service_name}_${mount_point}:
   #   name: ${STACK_NAME:-technocore}_${service_name}_${mount_point}
@@ -65,9 +65,10 @@ services:
           memory: 128M
         reservations:
           memory: 64M
-    #environment:
+    environment:
       # Sometimes you have to pass in ${DOMAIN} to enable the correct link paths to be generated.
       # Othertimes you can use http:// or https:// for the website. Weird trick.
+      - ADMIN_USER=${ADMIN_USER}
     image: ${image_provider:-scififarms}/technocore-EXAMPLE_SERVICE:${TAG:-latest}
     logging:
       driver: "${LOGGING_DRIVER}"
@@ -77,12 +78,8 @@ services:
       - EXAMPLE_SERVICE
       - EXAMPLE_SERVICE-private
     #secrets:
-    #  - source: EXAMPLE_SERVICE_EXAMPLE_SERVICE_db_username
-    #    target: EXAMPLE_SERVICE_db_username
     #  - source: EXAMPLE_SERVICE_EXAMPLE_SERVICE_db_password
     #    target: EXAMPLE_SERVICE_db_password
-    #  - source: EXAMPLE_SERVICE_domain
-    #    target: domain
     volumes:
       # Likely need to change this
       - EXAMPLE_SERVICE:/var/lib/EXAMPLE_SERVICE
