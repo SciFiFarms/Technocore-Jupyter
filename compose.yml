@@ -86,6 +86,8 @@ services:
     volumes:
       # Likely need to change this
       - EXAMPLE_SERVICE:/var/lib/EXAMPLE_SERVICE
+      # This should in fact be all upper case.
+      - ${DEV_MOUNT_EXAMPLE_SERVICE_SHELL_MIGRATIONS:-$EMPTY_MOUNT}
 
   EXAMPLE_SERVICE_db:
     deploy:
