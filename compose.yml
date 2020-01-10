@@ -1,56 +1,41 @@
 version: "3.5"
-# You should be able to find & replace all instances of jupyter with 
-# your actual_service_name. Then you just need address any places that 
-# typically need changes (designated by comments)
 
 networks:
   jupyter:
-  jupyter-private:
 
 volumes:
   jupyter:
-  jupyter-db:
 
 secrets:
-  # Secrets format
-  # ${service_name}_${mount_point}:
-  #   name: ${STACK_NAME:-technocore}_${service_name}_${mount_point}
-  # #   external: true
-  jupyter_admin_username:
-    name: ${STACK_NAME:-technocore}_jupyter_admin_username
-    external: true
   jupyter_admin_password:
     name: ${STACK_NAME:-technocore}_jupyter_admin_password
-    external: true
-  jupyter_jupyter-db_username:
-    name: ${STACK_NAME:-technocore}_jupyter_jupyter-db_username
     external: true
   jupyter_jupyter-db_password:
     name: ${STACK_NAME:-technocore}_jupyter_jupyter-db_password
     external: true
 
 services:
-  ## Uncomment this if Traefik will be used for routing traffick to this service.
-  #ingress:
-  #  networks:
-  #    - jupyter
+  # Uncomment this if Traefik will be used for routing traffick to this service.
+  ingress:
+    networks:
+      - jupyter
 
   jupyter:
     deploy:
       labels:
-      #  - traefik.frontend.rule=$JUPYTER_ROUTING_LABEL
-      #  - traefik.frontend.priority=$JUPYTER_ROUTING_LABEL_PRIORITY
-      #  - traefik.port=SET_ME_PLEASE
-      #  - ${TRAEFIK_BASIC_AUTH}
-      #  - traefik.enable=true
-      #  # You'll need to set applicaiton's port here.
-      #  - traefik.tags=ingress 
-      #  - traefik.docker.network=${STACK_NAME:-technocore}_jupyter
-      #  # Traefik service that listens to HTTP
-      #  - traefik.redirectorservice.frontend.entryPoints=http
-      #  - traefik.redirectorservice.frontend.redirect.entryPoint=https
-      #  # Traefik service that listens to HTTPS
-      #  - traefik.webservice.frontend.entryPoints=https
+        - traefik.frontend.rule=$JUPYTER_ROUTING_LABEL
+        - traefik.frontend.priority=$JUPYTER_ROUTING_LABEL_PRIORITY
+        # You'll need to set applicaiton's port here.
+        - traefik.port=SET_ME_PLEASE
+        - ${TRAEFIK_BASIC_AUTH}
+        - traefik.enable=true
+        - traefik.tags=ingress 
+        - traefik.docker.network=${STACK_NAME:-technocore}_jupyter
+        # Traefik service that listens to HTTP
+        - traefik.redirectorservice.frontend.entryPoints=http
+        - traefik.redirectorservice.frontend.redirect.entryPoint=https
+        # Traefik service that listens to HTTPS
+        - traefik.webservice.frontend.entryPoints=https
         - com.ouroboros.enable=true
       mode: global
       restart_policy:
@@ -59,11 +44,11 @@ services:
         constraints:
           - node.role == manager
       # Big services will need this modified or removed.
-      resources:
-        limits:
-          memory: 128M
-        reservations:
-          memory: 64M
+      #resources:
+      #  limits:
+      #    memory: 128M
+      #  reservations:
+      #    memory: 64M
     environment:
       # Sometimes you have to pass in ${DOMAIN} to enable the correct link paths to be generated.
       # Othertimes you can use http:// or https:// for the website. Weird trick.
@@ -75,7 +60,6 @@ services:
         tag: "{{.Name}}"
     networks:
       - jupyter
-      - jupyter-private
     #secrets:
     #  - source: jupyter_jupyter_db_password
     #    target: jupyter_db_password
@@ -83,31 +67,3 @@ services:
       # Likely need to change this
       - jupyter:/var/lib/jupyter
       - ${DEV_MOUNT_JUPYTER_SHELL_MIGRATIONS:-$EMPTY_MOUNT}
-
-  jupyter_db:
-    deploy:
-      labels:
-        - com.ouroboros.enable=true
-      mode: global
-      restart_policy:
-        condition: any
-    #environment:
-    image: ${image_provider:-scififarms}/technocore-jupyter-db:${TAG:-latest}
-    logging:
-      driver: "${LOGGING_DRIVER}"
-      options:
-        tag: "{{.Name}}"
-    networks:
-      - jupyter-private
-    secrets:
-      - source: jupyter_db_admin_username
-        target: admin_username
-      - source: jupyter_db_admin_password
-        target: admin_password
-      - source: jupyter_db_jupyter_username
-        target: jupyter_username
-      - source: jupyter_db_jupyter_password
-        target: jupyter_password
-    volumes:
-      # Likely need to change this
-      - jupyter-db:/var/lib/jupyter
