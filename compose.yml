@@ -26,7 +26,7 @@ services:
         - traefik.frontend.rule=$JUPYTER_ROUTING_LABEL
         - traefik.frontend.priority=$JUPYTER_ROUTING_LABEL_PRIORITY
         # You'll need to set applicaiton's port here.
-        - traefik.port=80
+        - traefik.port=8888
         - ${TRAEFIK_BASIC_AUTH}
         - traefik.enable=true
         - traefik.tags=ingress 
@@ -60,19 +60,6 @@ services:
         tag: "{{.Name}}"
     networks:
       - jupyter
-    #secrets:
-    #  - source: jupyter_jupyter_db_password
-    #    target: jupyter_db_password
-      #- source: jupyter_cert_bundle
-      #  target: cert_bundle
-      #  uid: "999" # This is set in Postgres' Dockerfile
-      #  mode: 0400
-      #- source: jupyter_key
-      #  target: key
-      #  uid: "999" # This is set in Postgres' Dockerfile
-      #  mode: 0400
-      #- source: ca
-      #  target: ca
     volumes:
       - jupyter:/var/lib/jupyter
       - ${DEV_MOUNT_JUPYTER_SHELL_MIGRATIONS:-$EMPTY_MOUNT}

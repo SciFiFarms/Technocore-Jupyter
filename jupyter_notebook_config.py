@@ -2,7 +2,7 @@
 
 c.NotebookApp.ip = '0.0.0.0'
 c.NotebookApp.open_browser = False
-c.NotebookApp.base_url = '/jupyter/'
+#c.NotebookApp.base_url = '/jupyter/'
 c.NotebookApp.token = ''
 c.NotebookApp.allow_origin = '*'
 c.NotebookApp.trust_xheaders = True 
