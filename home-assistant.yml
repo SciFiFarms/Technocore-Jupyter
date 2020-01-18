@@ -1,0 +1,6 @@
+version: "3.5"
+
+services:
+  home_assistant:
+    environment:
+      - "SIDEBAR_ESPHOME=        Data-Science: Jupyter|jupyter.$DOMAIN|mdi:microscope"

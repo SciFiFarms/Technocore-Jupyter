@@ -1,0 +1,65 @@
+version: "3.5"
+
+networks:
+  jupyter:
+
+volumes:
+  jupyter:
+
+secrets:
+  jupyter_admin_password:
+    name: ${STACK_NAME:-technocore}_jupyter_admin_password
+    external: true
+  jupyter_jupyter-db_password:
+    name: ${STACK_NAME:-technocore}_jupyter_jupyter-db_password
+    external: true
+
+services:
+  # Uncomment this if Traefik will be used for routing traffick to this service.
+  ingress:
+    networks:
+      - jupyter
+
+  jupyter:
+    deploy:
+      labels:
+        - traefik.frontend.rule=$JUPYTER_ROUTING_LABEL
+        - traefik.frontend.priority=$JUPYTER_ROUTING_LABEL_PRIORITY
+        # You'll need to set applicaiton's port here.
+        - traefik.port=8888
+        - ${TRAEFIK_BASIC_AUTH}
+        - traefik.enable=true
+        - traefik.tags=ingress 
+        - traefik.docker.network=${STACK_NAME:-technocore}_jupyter
+        # Traefik service that listens to HTTP
+        - traefik.redirectorservice.frontend.entryPoints=http
+        - traefik.redirectorservice.frontend.redirect.entryPoint=https
+        # Traefik service that listens to HTTPS
+        - traefik.webservice.frontend.entryPoints=https
+        - com.ouroboros.enable=true
+      mode: global
+      restart_policy:
+        condition: any
+      placement:
+        constraints:
+          - node.role == manager
+      # Big services will need this modified or removed.
+      #resources:
+      #  limits:
+      #    memory: 128M
+      #  reservations:
+      #    memory: 64M
+    environment:
+      # Sometimes you have to pass in ${DOMAIN} to enable the correct link paths to be generated.
+      # Othertimes you can use http:// or https:// for the website. Weird trick.
+      - ADMIN_USER=${ADMIN_USER}
+    image: ${image_provider:-scififarms}/technocore-jupyter:${TAG:-latest}
+    logging:
+      driver: "${LOGGING_DRIVER}"
+      options:
+        tag: "{{.Name}}"
+    networks:
+      - jupyter
+    volumes:
+      - jupyter:/var/lib/jupyter
+      - ${DEV_MOUNT_JUPYTER_SHELL_MIGRATIONS:-$EMPTY_MOUNT}
