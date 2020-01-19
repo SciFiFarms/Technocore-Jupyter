@@ -61,5 +61,5 @@ services:
     networks:
       - jupyter
     volumes:
-      - jupyter:/var/lib/jupyter
+      - jupyter:/home/jovyan/
       - ${DEV_MOUNT_JUPYTER_SHELL_MIGRATIONS:-$EMPTY_MOUNT}
