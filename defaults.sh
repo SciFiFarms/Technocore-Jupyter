@@ -8,6 +8,15 @@
 
 # Leave blank to disable this service by default.
 set_service_flag $service_name
+if [ "$LIVE_MOUNT_JUPYTER_ENABLED" ]; then
+    export JUPYTER_VOLUME=${TECHNOCORE_ROOT}/jupyter/
+else
+    export JUPYTER_VOLUME=jupyter
+
+    if ! docker volume ls | grep -w "${STACK_NAME}_jupyter" 1>&2 ; then
+        export SERVICE_CONFIG_JUPYTER_INIT=${TECHNOCORE_SERVICES}/jupyter/init.yml
+    fi
+fi
 #set_service_flag $service_name yes
 
 # Sets the application prefix depending on what $INGRESS_TYPE is set to. 
@@ -26,3 +35,4 @@ set_service_flag $service_name
 #generate_mount dev shell-migrations /usr/share/dogfish/shell-migrations
 
 set_optional_service home-assistant
+set_optional_service syncthing
