@@ -8,7 +8,7 @@ COPY jupyter_notebook_config.py /home/jovyan/.jupyter/jupyter_notebook_config.py
 
 ENV JUPYTER_ENABLE_LAB=yes 
 
-RUN jupyter labextension install "@jupyterlab/git"
+RUN jupyter labextension install "@jupyterlab/git" jupyterlab_vim
 RUN jupyter serverextension enable jupyterlab_sql --py --sys-prefix
 RUN jupyter lab build
 ## Add dogfish
