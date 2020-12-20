@@ -13,7 +13,7 @@ if [ "$LIVE_MOUNT_JUPYTER_ENABLED" ]; then
 else
     export JUPYTER_VOLUME=jupyter
 
-    if ! docker volume ls | grep -w "${STACK_NAME}_jupyter" 1>&2 ; then
+    if [ "$SERVICE_JUPYTER" ] && ! docker volume ls | grep -w "${STACK_NAME}_jupyter" > /dev/null ; then
         export SERVICE_CONFIG_JUPYTER_INIT=${TECHNOCORE_SERVICES}/jupyter/init.yml
     fi
 fi
